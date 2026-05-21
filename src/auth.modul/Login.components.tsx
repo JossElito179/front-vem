@@ -23,9 +23,10 @@ const Login = () => {
     }
 
     if (username === provisionalUser.username && password === provisionalUser.password) {
-      success(`Bienvenue ${provisionalUser.fullName} !`, {
+      success(`Connecté !`, {
         position: 'top-right',
       });
+      
       navigate('/dashboard');
       return;
     }

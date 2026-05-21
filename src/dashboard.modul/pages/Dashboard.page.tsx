@@ -1,7 +1,7 @@
 import Header from "../../templates.component/Headers.component"
 import Sidebar from "../../templates.component/Sidebar.component"
 import DashboardComponent from "../components/Dashboard.component"
-import Layout from "./Layout"
+// import Layout from "./Layout"
 
 const Dashboard = () => { 
     return (
