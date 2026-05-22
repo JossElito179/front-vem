@@ -1,21 +1,13 @@
 import AbscenceListComponent from "../components/AbscenceList.component"
-import Header from "../../templates.component/Headers.component"
-import Sidebar from "../../templates.component/Sidebar.component"
-
+import InsideSidebar from "../../templates.component/InsideSidebar.component"
 
 const AbscenceListes = () => {
     return (
-    <div className="">
-      <Sidebar id='absence' />
-      <Header />
-      <main className="ml-64 pt-20 text-start!">
-        <div className="">
-          <div className="flex">
-            <AbscenceListComponent />
-          </div>
+      <InsideSidebar>
+        <div className="flex">
+          <AbscenceListComponent />
         </div>
-      </main>
-    </div>
+      </InsideSidebar>
     )
 }
 

@@ -8,7 +8,7 @@ const TypeIcon = ({ type }: TypeIconProps) => {
   const config = TYPES[type] || TYPES.task;
   const Icon = config.icon;
 
-  return <Icon size={16} className={config.color.replace("bg-", "text-")} />;
+  return <Icon size={16} className={`${config.color.replace("bg-", "text-")} dark:opacity-80 transition-opacity`} />;
 };
 
 export default TypeIcon;

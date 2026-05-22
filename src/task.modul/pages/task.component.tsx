@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Search, Filter, Plus, Layout, List } from "lucide-react";
+import { Search, Plus, Layout, List } from "lucide-react";
 import type { Task, User } from "../data";
 import { PRIORITIES, TYPES, STATUSES, INITIAL_TASKS, USERS } from "../data";
 import TaskDetailModal from "../components/task.detail.modal.component";
 import TaskCreateModal from "../components/task.create.modal.component";
 import TaskViewCard from "../components/Task.view.card.component";
 import TaskFiltersModal from "../components/task.filters.modal.component";
+import InsideSidebar from "../../templates.component/InsideSidebar.component";
+import { IoIosAdd } from "react-icons/io";
 
 // Composants utilitaires
 const PriorityBadge = ({ priority }: { priority: string }) => {
@@ -36,7 +38,7 @@ const Avatar = ({ initials, color }: { initials: string; color: string }) => (
 );
 
 // Composant principal
-const TaskPage = () => {
+const TaskPageContent = () => {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
   const [searchQuery, setSearchQuery] = useState("");
@@ -178,12 +180,12 @@ const TaskPage = () => {
 
   // Vue Liste
   const ListView = (): React.ReactNode => (
-    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-245 w-full text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-slate-50 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-slate-600">
+              <th className="px-4 py-3 text-left font-medium text-slate-600 dark:text-gray-400">
                 Type
               </th>
               <th className="px-4 py-3 text-left font-medium text-slate-600">
@@ -218,16 +220,16 @@ const TaskPage = () => {
               return (
                 <tr
                   key={task.id}
-                  className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer"
+                  className="border-b border-slate-100 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer"
                   onClick={() => setSelectedTask(task)}
                 >
                   <td className="px-4 py-3">
                     <TypeIcon type={task.type} />
                   </td>
-                  <td className="px-4 py-3 text-left font-mono text-slate-500">
+                  <td className="px-4 py-3 text-left font-mono text-slate-500 dark:text-gray-400">
                     {task.id}
                   </td>
-                  <td className="px-4 py-3 text-left font-medium text-slate-800">
+                  <td className="px-4 py-3 text-left font-medium text-slate-800 dark:text-white">
                     {task.title}
                   </td>
                   <td className="px-4 py-3">
@@ -237,24 +239,30 @@ const TaskPage = () => {
                           initials={assignee.initials}
                           color={assignee.color}
                         />
-                        <span className="text-slate-600">{assignee.name}</span>
+                        <span className="text-slate-600 dark:text-gray-300">
+                          {assignee.name}
+                        </span>
                       </div>
                     ) : (
-                      <span className="text-slate-400">Non assigné</span>
+                      <span className="text-slate-400 dark:text-gray-500">
+                        Non assigné
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     <PriorityBadge priority={task.priority} />
                   </td>
                   <td className="px-4 py-3">
-                    <span className="px-2 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                    <span className="px-2 py-1 rounded text-xs font-medium bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-gray-300">
                       {statusConfig.name}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-600">
+                  <td className="px-4 py-3 text-slate-600 dark:text-gray-400">
                     {task.storyPoints}
                   </td>
-                  <td className="px-4 py-3 text-slate-500">{task.dueDate}</td>
+                  <td className="px-4 py-3 text-slate-500 dark:text-gray-400">
+                    {task.dueDate}
+                  </td>
                 </tr>
               );
             })}
@@ -265,16 +273,19 @@ const TaskPage = () => {
   );
 
   return (
-    <div className="w-full min-h-screen bg-slate-50">
+    <div className="w-full min-h-screen bg-slate-50 dark:bg-gray-950">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-4 py-4 sm:px-6">
+      <div className=" border-b border-slate-200 dark:border-gray-800 px-2 py-4 sm:px-2">
         <div className="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <Layout className="text-blue-600 shrink-0" size={28} />
-            <p className="text-2xl font-bold text-slate-900 truncate sm:text-lg">
+            <Layout
+              className="text-blue-600 dark:text-blue-500 shrink-0"
+              size={28}
+            />
+            <p className="text-3xl font-bold text-slate-900 dark:text-white truncate sm:text-lg">
               Gestion des tâches
             </p>
-            <span className="shrink-0 px-2 py-1 bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider">
+            <span className="shrink-0 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider">
               Kanban
             </span>
             {/* <button className="cursor-pointer shrink-0 px-2 py-2 bg-blue-100 text-blue-700 text-[10px] sm:text-xs font-bold rounded uppercase tracking-wider">
@@ -283,16 +294,16 @@ const TaskPage = () => {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="flex w-full bg-slate-100 rounded-lg p-1 sm:w-auto">
+            <div className="flex w-full bg-slate-100 dark:bg-gray-800 rounded-lg p-1 sm:w-auto">
               <button
                 onClick={() => setViewMode("board")}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${viewMode === "board" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${viewMode === "board" ? "bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-sm" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"}`}
               >
                 <Layout size={16} /> Board
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${viewMode === "list" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${viewMode === "list" ? "bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-sm" : "text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"}`}
               >
                 <List size={16} /> Liste
               </button>
@@ -300,7 +311,7 @@ const TaskPage = () => {
 
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="hidden items-center justify-center gap-2 border border-blue-600 hover:border-blue-700 text-blue-600 hover:text-blue-700 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm sm:flex"
+              className="hidden items-center justify-center gap-2 border border-blue-600 dark:border-blue-500 hover:border-blue-700 dark:hover:border-blue-400 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm sm:flex"
             >
               <Plus size={18} /> Créer
             </button>
@@ -311,7 +322,7 @@ const TaskPage = () => {
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:flex-wrap">
           <div className="relative w-full lg:flex-1 lg:max-w-md">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500"
               size={18}
             />
             <input
@@ -319,7 +330,7 @@ const TaskPage = () => {
               placeholder="Rechercher des tâches..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-100 border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-lg text-sm transition-all outline-none"
+              className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-gray-800 border-transparent dark:border-gray-700 focus:bg-white dark:focus:bg-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 text-sm transition-all outline-none"
             />
           </div>
 
@@ -327,22 +338,35 @@ const TaskPage = () => {
             <button
               type="button"
               onClick={() => setIsFiltersModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-gray-700 hover:text-slate-700 dark:hover:text-gray-300 transition-colors"
             >
-              <Filter size={16} className="text-slate-400" /> Filters
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"
+                />
+              </svg>{" "}
+              Filters
             </button>
           </div>
 
-          <div className="text-sm text-slate-500 lg:ml-auto">
+          <div className="text-sm text-slate-500 dark:text-gray-400 lg:ml-auto">
             {filteredTasks.length} tâches
           </div>
         </div>
       </div>
 
       {/* Contenu */}
-      <div className="p-6">
+      <div className="p-2 mt-2">
         {viewMode === "board" ? (
-          <div className="flex gap-4 overflow-x-auto pb-4 min-h-[calc(100vh-200px)]">
+          <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 min-h-[calc(100vh-200px)]">
             {Object.values(STATUSES).map((status: any) => {
               const columnTasks = (tasksByStatus[status.id] as Task[]) || [];
               const isWipExceeded =
@@ -357,27 +381,27 @@ const TaskPage = () => {
                   onDrop={(e) => handleDrop(e, status.id)}
                 >
                   <div
-                    className={`bg-slate-100 rounded-t-lg px-4 py-3 flex items-center justify-between border-b-2 transition-all ${dragOverStatusId === status.id ? "border-blue-500 bg-blue-50 shadow-md" : isWipExceeded ? "border-red-500 bg-red-50" : "border-transparent"}`}
+                    className={`bg-slate-100 dark:bg-gray-800 rounded-t-lg px-3 py-3 flex items-center justify-between border-b-2 transition-all ${dragOverStatusId === status.id ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md" : isWipExceeded ? "border-red-500 bg-red-50 dark:bg-red-900/20" : "border-transparent"}`}
                   >
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-700 text-sm uppercase tracking-wide">
+                      <h3 className="font-semibold text-slate-700 dark:text-gray-300 text-sm uppercase tracking-wide">
                         {status.name}
                       </h3>
-                      <span className="px-2 py-0.5 bg-slate-200 text-slate-600 text-xs rounded-full font-medium">
+                      <span className="px-2 py-0.5 bg-slate-200 dark:bg-gray-700 text-slate-600 dark:text-gray-400 text-xs rounded-full font-medium">
                         {columnTasks.length}
                       </span>
                     </div>
                     {status.name === "Backlog" && (
                       <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="px-2 border border-blue-200 rounded-lg text-gray-400 cursor-pointer"
+                        className="p-2 border border-blue-300 dark:border-blue-600 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer transition-all"
                       >
-                        +
+                        <IoIosAdd size={18} />
                       </button>
                     )}
                     {status.limit && (
                       <span
-                        className={`text-xs font-medium ${isWipExceeded ? "text-red-600" : "text-slate-500"}`}
+                        className={`text-xs font-medium ${isWipExceeded ? "text-red-600 dark:text-red-400" : "text-slate-500 dark:text-gray-400"}`}
                       >
                         WIP: {status.limit}
                       </span>
@@ -385,7 +409,7 @@ const TaskPage = () => {
                   </div>
 
                   <div
-                    className={`bg-slate-100 rounded-b-lg p-3 shrink-0 min-h-50 transition-all ${dragOverStatusId === status.id ? "ring-2 ring-blue-400 ring-inset" : ""}`}
+                    className={`bg-slate-100 dark:bg-gray-800 rounded-b-lg p-3 shrink-0 min-h-50 transition-all ${dragOverStatusId === status.id ? "ring-2 ring-blue-400 dark:ring-blue-500 ring-inset" : ""}`}
                   >
                     {columnTasks.map((task: Task) => (
                       <TaskViewCard
@@ -417,7 +441,7 @@ const TaskPage = () => {
                     {status.id === "backlog" && (
                       <button
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-sm hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2 border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-lg text-slate-500 dark:text-gray-400 text-sm hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center gap-2"
                       >
                         <Plus size={16} /> Ajouter une tâche
                       </button>
@@ -454,6 +478,14 @@ const TaskPage = () => {
         />
       )}
     </div>
+  );
+};
+
+const TaskPage = () => {
+  return (
+    <InsideSidebar>
+      <TaskPageContent />
+    </InsideSidebar>
   );
 };
 

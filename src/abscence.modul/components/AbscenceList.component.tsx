@@ -1,5 +1,4 @@
 import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import React, { useState } from 'react';
 
 const AbscenceListComponent = () => {
     function createData(

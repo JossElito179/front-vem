@@ -1,15 +1,7 @@
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material"
 import logo from '../assets/logo_complete.jpeg'
-import { useState } from "react"
 
 const Signup = () => {
-
-    const [name, setName] = useState('');
-    const [surname, setSurname] = useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
 
 
 

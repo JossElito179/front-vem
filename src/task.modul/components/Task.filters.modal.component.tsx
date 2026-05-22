@@ -23,13 +23,13 @@ const TaskFiltersModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h2 className="text-lg font-bold text-slate-900">Filters</h2>
+      <div className="w-full max-w-lg rounded-xl bg-white dark:bg-gray-800 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-gray-700 px-6 py-4">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">Filters</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600"
+            className="text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-400"
           >
             <X size={24} />
           </button>
@@ -103,14 +103,14 @@ const TaskFiltersModal = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
+        <div className="flex items-center justify-between border-t border-slate-200 dark:border-gray-700 px-6 py-4">
           <button
             type="button"
             onClick={() => {
               setFilterPriority("all");
               setFilterAssignee("all");
             }}
-            className="text-sm font-medium text-slate-500 hover:text-slate-700"
+            className="text-sm font-medium text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300"
           >
             Réinitialiser
           </button>

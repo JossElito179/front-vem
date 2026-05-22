@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { TbLayoutDashboard } from "react-icons/tb";
 import { FaCalendarXmark } from "react-icons/fa6";
 import { FaTasks } from "react-icons/fa";
@@ -7,87 +9,152 @@ import { FaFingerprint } from "react-icons/fa";
 import { FaArrowsDownToPeople } from "react-icons/fa6";
 import { IoSettingsSharp } from "react-icons/io5";
 
-const Sidebar = ( { id }: { id: string }) => {
-  console.log(id)
-  const [activeItem, setActiveItem] = useState(id);
+interface SidebarProps {
+  isCollapsed?: boolean;
+  isMobile?: boolean;
+  onCloseMobile?: () => void;
+}
 
+const Sidebar: React.FC<SidebarProps> = ({ 
+  isCollapsed = false, 
+  isMobile = false, 
+  onCloseMobile 
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Menu items configuration
   const menuItems = [
     {
-      id: 'dashboard', 
-      label: 'Dashboard', 
-      icon: TbLayoutDashboard,  // ← Référence au composant, pas string
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: TbLayoutDashboard,
       link: '/dashboard'
     },
     { 
-      id: 'absence', 
-      label: 'Absence', 
-      icon: FaCalendarXmark, 
-      link: '/abscence/list'  // ← Correction de l'orthographe
+      id: 'absence',
+      label: 'Absence',
+      icon: FaCalendarXmark,
+      link: '/abscence'
     },
     { 
-      id: 'taches', 
-      label: 'Tâches', 
-      icon: FaTasks, 
-      link: '/tasks' 
+      id: 'taches',
+      label: 'Tâches',
+      icon: FaTasks,
+      link: '/tasks'
     },
     { 
-      id: 'fiche-paie', 
-      label: 'Fiche de paie', 
-      icon: FaMoneyBillWave, 
-      link: '/paies/fisk' 
+      id: 'fiche-paie',
+      label: 'Fiche de paie',
+      icon: FaMoneyBillWave,
+      link: '/paies/fisk'
     },
     { 
-      id: 'pointeur', 
-      label: 'Pointeur', 
-      icon: FaFingerprint, 
-      link: '/pointeur' 
+      id: 'pointeur',
+      label: 'Pointeur',
+      icon: FaFingerprint,
+      link: '/pointeur'
     },
     { 
-      id: 'parametrages', 
-      label: 'Paramétrages', 
-      icon: IoSettingsSharp, 
-      link: '/parametrages' 
+      id: 'parametrages',
+      label: 'Paramétrages',
+      icon: IoSettingsSharp,
+      link: '/parametrages'
     },
     { 
-      id: 'n-1', 
-      label: 'N - 1', 
-      icon: FaArrowsDownToPeople, 
-      link: '/subordonnees'  // ← Correction du path
+      id: 'n-1',
+      label: 'N - 1',
+      icon: FaArrowsDownToPeople,
+      link: '/subordonnees'
     },
   ];
 
+  // Déterminer l'élément actif basé sur la route actuelle
+  const activeItem = useMemo(() => {
+    const currentPath = location.pathname;
+    const activeMenu = menuItems.find(item => 
+      currentPath === item.link || currentPath.startsWith(item.link + '/')
+    );
+    return activeMenu?.id || 'dashboard';
+  }, [location.pathname, menuItems]);
+
   return (
-    <aside className="w-64 bg-gray-100 text-gray-800 h-screen fixed shadow-xl left-0 top-0 flex flex-col">
-      {/* Logo / Brand */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-gray-900">Victus</span>
-          <span className="text-xl font-bold text-gray-500">&lt;V&gt;</span>
+    <aside className={`
+      h-screen flex flex-col justify-between relative
+      bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800
+      transition-all duration-300
+      ${isCollapsed ? "w-20" : "w-64"}
+      ${isMobile ? "fixed" : ""}
+    `}>
+      {/* Mobile close button */}
+      {isMobile && onCloseMobile && (
+        <button
+          onClick={onCloseMobile}
+          className="absolute top-4 right-4 z-50 p-2 rounded-lg
+            bg-gray-100 dark:bg-gray-800
+            text-gray-600 dark:text-gray-400
+            hover:bg-red-100 dark:hover:bg-red-900/20
+            hover:text-red-500 dark:hover:text-red-400
+            transition-all duration-200"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Header / Logo */}
+      <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+        <div className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-2"}`}>
+          <span className="text-2xl font-bold text-gray-900 dark:text-white">
+            {isCollapsed ? 'V' : 'Victus'}
+          </span>
+          {!isCollapsed && (
+            <span className="text-xl font-bold text-gray-500 dark:text-gray-400">&lt;V&gt;</span>
+          )}
         </div>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 mt-6">
+      <nav className="flex-1 mt-6 overflow-y-auto overflow-x-hidden px-3 py-2 space-y-1">
         <ul className="space-y-1">
           {menuItems.map((item) => {
-            const IconComponent = item.icon;  // ← Récupère le composant icône
+            const IconComponent = item.icon;
+            const isActive = activeItem === item.id;
+            
             return (
-              <li key={item.id}>  {/* ← key sur le li */}
-                <a href={item.link}>  {/* ← a à l'intérieur du li */}
-                  <button
-                    onClick={() => setActiveItem(item.id)}
-                    className={`w-full flex items-center space-x-3 px-6 py-3 transition-colors duration-200 ${
-                      activeItem === item.id
-                        ? 'bg-gray-200 text-gray-900 border-l-4 border-orange-600'
-                        : 'text-gray-700 hover:bg-gray-200 hover:text-gray-900'
-                    }`}
-                  >
-                    <span className="text-xl">
-                      <IconComponent />  {/* ← Utilisation correcte de l'icône */}
+              <li key={item.id}>
+                <button
+                  onClick={() => {
+                    navigate(item.link);
+                    if (isMobile && onCloseMobile) onCloseMobile();
+                  }}
+                  className={`
+                    group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                    transition-all duration-300 overflow-hidden
+                    ${
+                      isActive
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50'
+                    }
+                  `}
+                >
+                    {/* Active indicator */}
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-r-full" />
+                    )}
+                    
+                    <span className={`
+                      relative z-10 text-xl transition-transform duration-300
+                      ${isActive ? "scale-110" : "group-hover:scale-110"}
+                    `}>
+                      <IconComponent />
                     </span>
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                </a>
+                    
+                    {!isCollapsed && (
+                      <span className="relative z-10 font-medium text-sm truncate">
+                        {item.label}
+                      </span>
+                    )}
+                </button>
               </li>
             );
           })}
@@ -95,15 +162,17 @@ const Sidebar = ( { id }: { id: string }) => {
       </nav>
 
       {/* Footer / User Info */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-            <span className="text-sm">👤</span>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <div className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"}`}>
+          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs">
+            U
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-900">USER 100</p>
-            <p className="text-xs text-gray-600">Employé</p>
-          </div>
+          {!isCollapsed && (
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">USER 100</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Employé</p>
+            </div>
+          )}
         </div>
       </div>
     </aside>

@@ -25,7 +25,7 @@ const routes: RouteObject[] = [
 		element: createElement(AbscenceDemande),
 	},
 	{
-		path: '/abscence/list',
+		path: '/abscence',
 		element: createElement(AbscenceListes),
 	},
 	{

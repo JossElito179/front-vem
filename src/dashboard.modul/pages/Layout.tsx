@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '../../templates.component/Headers.component';
-import Sidebar from '../../templates.component/Sidebar.component';
+// import Sidebar from '../../templates.component/Sidebar.component';
 
 interface LayoutProps {
   children: React.ReactNode;
