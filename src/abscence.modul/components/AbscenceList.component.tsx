@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import AbsenceForm from './AbscenceForm.component';
 
 const AbscenceListComponent = () => {
+    const [isAbsenceFormModalOpen, setIsAbsenceFormModalOpen] = useState(false);
     function createData(
         date: string,
         type: string,
@@ -85,13 +88,20 @@ const AbscenceListComponent = () => {
                     </TableContainer>
                 </div>
                 <div className="button-container mt-5">
-                    <a href="/abscence/demande">
-                        <Button className=" w-70 h-12 bg-gray-900! text-white!" >
-                            Demander une abscence
-                        </Button>
-                    </a>
+                    <Button
+                        onClick={() => setIsAbsenceFormModalOpen(true)}
+                        className=" w-70 h-12 bg-gray-900! text-white!" 
+                    >
+                        Demander une absence
+                    </Button>
                 </div>
             </div>
+
+            {/* Modal Formulaire d'absence */}
+            <AbsenceForm 
+                isOpen={isAbsenceFormModalOpen} 
+                onClose={() => setIsAbsenceFormModalOpen(false)} 
+            />
         </div>
     );
 };

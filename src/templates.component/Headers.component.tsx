@@ -7,9 +7,9 @@ interface HeaderProps {
   onLogoutRequest?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ 
+const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
-  onLogoutRequest
+  onLogoutRequest,
 }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
@@ -69,6 +69,9 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Right Actions */}
         <div className="flex items-center space-x-2 md:space-x-4">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Notification Button */}
           <button className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
             <svg
@@ -87,9 +90,6 @@ const Header: React.FC<HeaderProps> = ({
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
-          {/* Theme Toggle */}
-          <ThemeToggle />
-
           {/* User Menu */}
           <div className="relative" ref={userMenuRef}>
             <button
@@ -100,8 +100,12 @@ const Header: React.FC<HeaderProps> = ({
                 U
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">USER 100</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Administrateur</p>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  USER 100
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Administrateur
+                </p>
               </div>
               <svg
                 className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ease-out hidden md:block ${
