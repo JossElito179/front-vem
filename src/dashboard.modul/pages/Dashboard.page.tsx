@@ -1,21 +1,13 @@
-import Header from "../../templates.component/Headers.component"
-import Sidebar from "../../templates.component/Sidebar.component"
+import InsideSidebar from "../../templates.component/InsideSidebar.component"
 import DashboardComponent from "../components/Dashboard.component"
-import Layout from "./Layout"
 
 const Dashboard = () => { 
     return (
-    <div className="">
-      <Sidebar id='dashboard' />
-      <Header />
-      <main className="ml-64 pt-20 text-start!">
-        <div className="">
-          <div className="flex">
-            <DashboardComponent />
-          </div>
+      <InsideSidebar>
+        <div className="flex">
+          <DashboardComponent />
         </div>
-      </main>
-    </div>
+      </InsideSidebar>
     )
 }
 

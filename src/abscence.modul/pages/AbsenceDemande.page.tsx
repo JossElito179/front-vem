@@ -1,22 +1,17 @@
-
+import { useState } from "react"
 import AbsenceForm from "../components/AbscenceForm.component"
-import Sidebar from "../../templates.component/Sidebar.component"
-import Header from "../../templates.component/Headers.component"
-
+import InsideSidebar from "../../templates.component/InsideSidebar.component"
 
 const AbscenceDemande = () => {
+  const [isFormOpen, setIsFormOpen] = useState(true)
+
   return (
-    <div className="">
-      <Sidebar id='absence' />
-      <Header />
-      <main className="ml-64 pt-20 text-start!">
-        <div className="">
-          <div className="flex">
-            <AbsenceForm />
-          </div>
-        </div>
-      </main>
-    </div>
+    <InsideSidebar>
+      <AbsenceForm 
+        isOpen={isFormOpen} 
+        onClose={() => setIsFormOpen(false)} 
+      />
+    </InsideSidebar>
   )
 }
 

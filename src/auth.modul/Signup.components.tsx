@@ -2,6 +2,9 @@ import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } fr
 import logo from '../assets/logo_complete.jpeg'
 
 const Signup = () => {
+
+
+
     return (
         <div className="main-component" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center'}}>
             <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
@@ -10,7 +13,7 @@ const Signup = () => {
                     <Grid size={6}>
                         <div style={{ 
                             padding: '40px', 
-                            backgroundColor: 'white', 
+                            backgroundColor: 'white',
                             borderRadius: '20px',
                             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                             height: '100%'
