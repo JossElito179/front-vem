@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FiLogOut, FiSettings, FiUser } from "react-icons/fi";
 import ThemeToggle from "../components/ThemeToogle";
+import { useAuth } from "../auth.modul/AuthProvider";
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
@@ -13,6 +14,8 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -144,7 +147,7 @@ const Header: React.FC<HeaderProps> = ({
                 <button
                   onClick={() => {
                     setUserMenuOpen(false);
-                    if (onLogoutRequest) onLogoutRequest();
+                    logout();
                   }}
                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >

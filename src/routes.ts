@@ -6,6 +6,7 @@ import Dashboard from './dashboard.modul/pages/Dashboard.page'
 import AbscenceDemande from './abscence.modul/pages/AbsenceDemande.page'
 import AbscenceListes from './abscence.modul/pages/AbscenceList.page'
 import TaskPage from './task.modul/pages/task.component'
+import ProtectedRoute from './auth.modul/ProtectedRoute'
 
 const routes: RouteObject[] = [
 	{
@@ -18,19 +19,19 @@ const routes: RouteObject[] = [
 	},
 	{
 		path: '/dashboard',
-		element: createElement(Dashboard),
+		element: createElement(ProtectedRoute, null, createElement(Dashboard)),
 	},
 	{
 		path: '/abscence/demande',
-		element: createElement(AbscenceDemande),
+		element: createElement(ProtectedRoute, null, createElement(AbscenceDemande)),
 	},
 	{
 		path: '/abscence',
-		element: createElement(AbscenceListes),
+		element: createElement(ProtectedRoute, null, createElement(AbscenceListes)),
 	},
 	{
 		path: '/tasks',
-		element: createElement(TaskPage)
+		element: createElement(ProtectedRoute, null, createElement(TaskPage))
 	}
 ]
 

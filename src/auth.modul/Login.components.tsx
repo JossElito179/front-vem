@@ -1,44 +1,56 @@
 import { Button, Grid, TextField } from "@mui/material";
 import logo from "../assets/logo_complete.jpeg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../components/Toast.tsx";
-import { provisionalUser } from "../utils/data";
+import { useAuth } from "./AuthProvider";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { success, error, warning } = useToast();
   const navigate = useNavigate();
+  const { login, loading, isAuthenticated } = useAuth();
 
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!username || !password) {
-      warning("Veuillez renseigner le nom d'utilisateur et le mot de passe.", {
-        position: 'top-center',
+    if (!email || !password) {
+      warning("Veuillez renseigner l'email et le mot de passe.", {
+        position: "top-center",
       });
       return;
     }
 
-    if (username === provisionalUser.username && password === provisionalUser.password) {
-      success(`Connecté !`, {
-        position: 'top-right',
+    try {
+      await login(email, password);
+      success("Connexion réussie.", {
+        position: "top-right",
       });
-      
-      navigate('/dashboard');
-      return;
+      navigate("/dashboard");
+    } catch {
+      error("Identifiants incorrects.", {
+        position: "top-center",
+      });
     }
-
-    error("Identifiants incorrects.", {
-      position: 'top-center',
-    });
   };
 
-
   return (
+
+      
     <>
+    { loading || isAuthenticated ? (
+      <div className="items-center flex h-screen justify-center">
+        loading...
+      </div>
+    ) : 
+  (
       <div className="main-component">
         <div className="container">
           <Grid container spacing={2}>
@@ -56,15 +68,15 @@ const Login = () => {
                     <form action="" method="post" onSubmit={handleSubmit}>
                       <div className="form-control flex flex-col mt-5">
                         <p className="text-start mb-2">
-                          <label htmlFor="username"> Username</label>
+                          <label htmlFor="email"> Email</label>
                         </p>
                         <TextField
                           id="outlined-basic"
                           className="mt-10"
-                          label="👤 Nom d'utilisateur"
+                          label="📧 Adresse email"
                           variant="outlined"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
                       <div className="form-control flex flex-col mt-5">
@@ -82,7 +94,11 @@ const Login = () => {
                         />
                       </div>
                       <div className="button-container mt-10">
-                        <Button type="submit" className="w-full h-12 bg-gray-900! text-white!">
+                        <Button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full h-12 bg-gray-900! text-white!"
+                        >
                           Se connecter
                         </Button>
                       </div>
@@ -164,6 +180,7 @@ const Login = () => {
           </Grid>
         </div>
       </div>
+  )}
     </>
   );
 };
