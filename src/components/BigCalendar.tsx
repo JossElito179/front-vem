@@ -1,7 +1,8 @@
 // components/BigCalendar.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { fetchHolidays, type Holiday } from "../utils/holidays";
 
 type EventType = {
   title: string;
@@ -28,11 +29,19 @@ const events: EventType[] = [];
 
 const BigCalendar = ({ onDateSelect }: BigCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date(2026, 4));
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
 
   const today = new Date();
   const todayDay = today.getDate();
   const todayMonth = today.getMonth();
   const todayYear = today.getFullYear();
+
+  // hook pour charger les jours fériés au montage du composant
+  useEffect(() => {
+    fetchHolidays().then((data) => {
+      setHolidays(data);
+    });
+  }, []);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -42,6 +51,15 @@ const BigCalendar = ({ onDateSelect }: BigCalendarProps) => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const prevMonthDays = new Date(year, month, 0).getDate();
+
+  // Fonction pour vérifier si un jour est férié
+  const isHoliday = (day: number) => {
+    const monthFormatted = String(month + 1).padStart(2, "0");
+    const dayFormatted = String(day).padStart(2, "0");
+    const fullDate = `${year}-${monthFormatted}-${dayFormatted}`;
+    
+    return holidays.find((holiday) => holiday.date === fullDate);
+  };
 
   const prevMonth = () => {
     setCurrentDate(new Date(year, month - 1));
@@ -131,6 +149,8 @@ const BigCalendar = ({ onDateSelect }: BigCalendarProps) => {
         {cells.map((cell, index) => {
           const dayEvents = events.filter((event) => event.day === cell.day);
 
+          const holiday = cell.currentMonth && isHoliday(cell.day);
+
           const handleDateClick = () => {
             if (cell.currentMonth && onDateSelect) {
               const monthFormatted = String(month + 1).padStart(2, "0");
@@ -146,10 +166,12 @@ const BigCalendar = ({ onDateSelect }: BigCalendarProps) => {
               onClick={handleDateClick}
               className={`relative h-30 border border-b border-gray-200 dark:border-white/10 p-2 cursor-pointer
                 ${
-                  cell.day === todayDay &&
-                  month === todayMonth &&
-                  year === todayYear &&
-                  cell.currentMonth
+                  holiday
+                    ? "bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50"
+                    : cell.day === todayDay &&
+                      month === todayMonth &&
+                      year === todayYear &&
+                      cell.currentMonth
                     ? "bg-blue-500 dark:bg-blue-600 text-white font-semibold hover:bg-blue-600 dark:hover:bg-blue-700"
                     : "bg-white dark:bg-[#0d1621] hover:bg-gray-50 dark:hover:bg-gray-800"
                 }
@@ -159,10 +181,12 @@ const BigCalendar = ({ onDateSelect }: BigCalendarProps) => {
               <div
                 className={`text-right text-xl
                   ${
-                    cell.day === todayDay &&
-                    month === todayMonth &&
-                    year === todayYear &&
-                    cell.currentMonth
+                    holiday
+                      ? "text-emerald-700 dark:text-emerald-100 font-semibold"
+                      : cell.day === todayDay &&
+                        month === todayMonth &&
+                        year === todayYear &&
+                        cell.currentMonth
                       ? "text-white"
                       : cell.currentMonth
                         ? "text-gray-900 dark:text-white"
@@ -184,6 +208,13 @@ const BigCalendar = ({ onDateSelect }: BigCalendarProps) => {
                   </div>
                 ))}
               </div>
+
+              {/* HOLIDAY LABEL */}
+              {holiday && (
+                <div className="mt-2 text-center text-xs font-semibold text-emerald-700 dark:text-emerald-100 truncate">
+                  {holiday.localName || holiday.name}
+                </div>
+              )}
             </div>
           );
         })}

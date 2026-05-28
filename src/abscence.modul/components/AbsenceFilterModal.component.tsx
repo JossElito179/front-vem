@@ -103,7 +103,7 @@ const AbsenceFilterModal = ({
                                         }}
                                         className="py-2 px-4 text-left font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600 border-b border-gray-100 dark:border-gray-600 transition-colors"
                                     >
-                                        Congés payés
+                                        Congés
                                     </button>
                                     <button
                                         onClick={() => {

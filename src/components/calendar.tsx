@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { fetchHolidays, type Holiday } from "../utils/holidays";
 
 interface CalendarProps {
   onDateSelect?: (date: string) => void;
 }
 
-interface Holiday {
-  date: string;
-  localName: string;
-  name: string;
-}
 
 // const days = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const days = ["Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa"];
@@ -32,14 +28,9 @@ const Calendar = ({ onDateSelect }: CalendarProps) => {
   const prevMonthDays = new Date(year, month, 0).getDate();
 
   useEffect(() => {
-    fetch("https://date.nager.at/api/v3/PublicHolidays/2026/MG")
-      .then((res) => res.json())
-      .then((data) => {
-        setHolidays(data);
-      })
-      .catch((err) => {
-        console.error("Erreur lors du chargement des jours fériés:", err);
-      });
+    fetchHolidays().then((data) => {
+      setHolidays(data);
+    });
   }, []);
 
   const prevMonth = () => {

@@ -4,6 +4,9 @@ import { useLocation } from "react-router-dom";
 const RouteLoader = () => {
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
+  const isDarkMode =
+    typeof window !== "undefined" &&
+    window.document.documentElement.classList.contains("dark");
 
   useEffect(() => {
     setIsVisible(true);
@@ -20,9 +23,13 @@ const RouteLoader = () => {
   }
 
   return (
-    <div className="pointer-events-none fixed left-0 top-0 z-50 h-1 w-full overflow-hidden bg-transparent">
+    <div
+      className={`pointer-events-none fixed inset-0 z-50 overflow-hidden backdrop-blur-sm ${
+        isDarkMode ? "bg-slate-950/25" : "bg-white/35"
+      }`}
+    >
       <div
-        className="h-full w-1/3 rounded-r-full bg-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.65)]"
+        className="absolute left-0 top-0 h-1 w-1/3 rounded-r-full bg-blue-600 shadow-[0_0_12px_rgba(37,99,235,0.65)]"
         style={{ animation: "route-loader-slide 0.9s ease-in-out infinite" }}
       />
       <style>{`

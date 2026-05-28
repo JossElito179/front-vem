@@ -11,9 +11,10 @@ interface AbscenceFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedDate?: string;
+  onSuccess?: () => void;
 }
 
-const AbsenceForm = ({ isOpen, onClose, selectedDate }: AbscenceFormModalProps) => {
+const AbsenceForm = ({ isOpen, onClose, selectedDate, onSuccess }: AbscenceFormModalProps) => {
   const [configs, setConfigs] = useState<AbsenceConfig[]>([]);
   const [isLoadingConfigs, setIsLoadingConfigs] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,7 +24,7 @@ const AbsenceForm = ({ isOpen, onClose, selectedDate }: AbscenceFormModalProps) 
     motif: "",
     idConfigAbsence: "",
     typeJournee: "JOURNEE",
-    priorite: "NORMALE",
+    priorite: "NORMALE", 
   });
 
   useEffect(() => {
@@ -98,7 +99,11 @@ const AbsenceForm = ({ isOpen, onClose, selectedDate }: AbscenceFormModalProps) 
         typeJournee: "JOURNEE",
         priorite: "NORMALE",
       });
-      onClose();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onClose();
+      }
     } catch {
       alert("Impossible d'enregistrer la demande d'absence.");
     } finally {
@@ -200,6 +205,23 @@ const AbsenceForm = ({ isOpen, onClose, selectedDate }: AbscenceFormModalProps) 
                     {config.libelle} ({config.typeAbsence})
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* Type de journée */}
+            <div>
+              <label className="block text-sm text-left font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Type de journée
+              </label>
+              <select
+                name="typeJournee"
+                value={formData.typeJournee}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              >
+                <option value="JOURNEE">JOURNEE</option>
+                <option value="MATIN">MATIN</option>
+                <option value="APRES_MIDI">APRES_MIDI</option>
               </select>
             </div>
 
