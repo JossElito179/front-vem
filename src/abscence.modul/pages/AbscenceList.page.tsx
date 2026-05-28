@@ -1,17 +1,11 @@
 import { useState } from "react";
 import AbscenceListComponent from "../components/AbscenceList.component";
 import InsideSidebar from "../../templates.component/InsideSidebar.component";
-import BigCalendar from "../../components/BigCalendar";
 import AbsenceForm from "../components/AbscenceForm.component";
 
 const AbscenceListes = () => {
   const [isAbsenceFormModalOpen, setIsAbsenceFormModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
-
-  const handleCalendarDateSelect = (date: string) => {
-    setSelectedDate(date);
-    setIsAbsenceFormModalOpen(true);
-  };
 
   return (
     <InsideSidebar>

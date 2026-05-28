@@ -2,9 +2,9 @@ import { Calendar, MoreHorizontal } from "lucide-react";
 import type { DragEvent, MouseEvent as ReactMouseEvent } from "react";
 import type { ApiTask } from "../task.service";
 import { getAvatarColor, getInitials } from "../data";
-import Avatar from "./task.avatar.component";
-import PriorityBadge from "./task.priority-badge.component";
-import TypeIcon from "./task.type-icon.component";
+import Avatar from "./Task.avatar.component";
+import PriorityBadge from "./Task.priority-badge.component";
+import TypeIcon from "./Task.type-icon.component";
 
 type TaskViewCardProps = {
   task: ApiTask;
@@ -16,6 +16,7 @@ type TaskViewCardProps = {
   onOpenContextMenu: (taskId: number, x: number, y: number) => void;
   onCloseContextMenu: () => void;
   onCompleteTask: (taskId: number) => void;
+  onEditTask: (task: ApiTask) => void;
 };
 
 const TaskViewCard = ({
@@ -28,6 +29,7 @@ const TaskViewCard = ({
   onOpenContextMenu,
   onCloseContextMenu,
   onCompleteTask,
+  onEditTask,
 }: TaskViewCardProps) => {
   const isOverdue = task.statut === 'EN_RETARD';
   const isCompleted = task.statut === 'TERMINE';
@@ -93,6 +95,14 @@ const TaskViewCard = ({
           style={{ left: contextMenuPosition.x, top: contextMenuPosition.y }}
           onClick={(event) => event.stopPropagation()}
         >
+          <button
+            type="button"
+            onClick={() => { onEditTask(task); onCloseContextMenu(); }}
+            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-700"
+          >
+            ✎ Modifier
+          </button>
+          <hr className="my-1 border-slate-100 dark:border-gray-700" />
           <button
             type="button"
             onClick={() => { onCompleteTask(task.id); onCloseContextMenu(); }}

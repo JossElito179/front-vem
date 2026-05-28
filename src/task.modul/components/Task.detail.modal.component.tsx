@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { Calendar, X } from "lucide-react";
+import { Calendar, Pencil, X } from "lucide-react";
 import { toast } from "react-toastify";
 import type { ApiTask } from "../task.service";
 import { completeTask } from "../task.service";
 import { STATUSES, getAvatarColor, getInitials } from "../data";
-import TypeIcon from "./task.type-icon.component";
-import PriorityBadge from "./task.priority-badge.component";
-import Avatar from "./task.avatar.component";
+import TypeIcon from "./Task.type-icon.component";
+import PriorityBadge from "./Task.priority-badge.component";
+import Avatar from "./Task.avatar.component";
 
 type TaskDetailModalProps = {
   task: ApiTask | null;
   onClose: () => void;
   onTaskUpdated?: (task: ApiTask) => void;
+  onEdit?: () => void;
 };
 
-const TaskDetailModal = ({ task, onClose, onTaskUpdated }: TaskDetailModalProps) => {
+const TaskDetailModal = ({ task, onClose, onTaskUpdated, onEdit }: TaskDetailModalProps) => {
   const [completing, setCompleting] = useState(false);
   const [completionComment, setCompletionComment] = useState('');
 
@@ -53,9 +54,21 @@ const TaskDetailModal = ({ task, onClose, onTaskUpdated }: TaskDetailModalProps)
               {STATUSES[task.statut]?.name ?? task.statut}
             </span>
           </div>
-          <button onClick={onClose} className="text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-400">
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                title="Modifier la tâche"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                <Pencil size={15} />
+                Modifier
+              </button>
+            )}
+            <button onClick={onClose} className="text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-400">
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         <div className="p-6 space-y-6">

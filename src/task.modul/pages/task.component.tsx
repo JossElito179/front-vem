@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Search, Plus, Layout, List } from "lucide-react";
+import { Search, Plus, Layout, List, SlidersHorizontal, X as XIcon } from "lucide-react";
 import { toast } from "react-toastify";
 import { IoIosAdd } from "react-icons/io";
 import type { ApiTask } from "../task.service";
 import { getMyTasks, getTeamTasks, completeTask } from "../task.service";
-import { STATUSES, getAvatarColor, getInitials } from "../data";
+import { PRIORITIES, STATUSES, getAvatarColor, getInitials } from "../data";
 import TaskDetailModal from "../components/Task.detail.modal.component";
 import TaskCreateModal from "../components/Task.create.modal.component";
+import TaskEditModal from "../components/Task.edit.modal.component";
 import TaskViewCard from "../components/Task.view.card.component";
 import TaskFiltersModal from "../components/Task.filters.modal.component";
 import Avatar from "../components/Task.avatar.component";
@@ -84,12 +85,17 @@ const TaskPageContent = () => {
   const [tasks, setTasks] = useState<ApiTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [taskView, setTaskView] = useState<'mine' | 'team'>('mine');
+  const [tabCounts, setTabCounts] = useState<{ mine: number | null; team: number | null }>({
+    mine: null,
+    team: null,
+  });
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ApiTask | null>(null);
   const [draggedTask, setDraggedTask] = useState<ApiTask | null>(null);
   const [dragOverStatusId, setDragOverStatusId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<ApiTask | null>(null);
@@ -105,6 +111,7 @@ const TaskPageContent = () => {
       try {
         const data = taskView === 'team' ? await getTeamTasks() : await getMyTasks();
         setTasks(data);
+        setTabCounts(prev => ({ ...prev, [taskView]: data.length }));
       } catch (error) {
         toast.error(error instanceof Error ? error.message : 'Impossible de charger les tâches');
       } finally {
@@ -113,6 +120,19 @@ const TaskPageContent = () => {
     };
     void run();
   }, [taskView]);
+
+  // Seed the inactive tab's count silently on mount so both badges are
+  // visible without the user having to switch tabs first.
+  useEffect(() => {
+    if (!hasTeamPerm) return;
+    const seedTeamCount = async () => {
+      try {
+        const data = await getTeamTasks();
+        setTabCounts(prev => ({ ...prev, team: data.length }));
+      } catch { /* silent */ }
+    };
+    void seedTeamCount();
+  }, [hasTeamPerm]);
 
   useEffect(() => {
     const close = () => setContextMenuState(null);
@@ -167,24 +187,69 @@ const TaskPageContent = () => {
     setDraggedTask(null);
   };
 
+  // Re-fetch the correct scoped list silently (no spinner) after any mutation.
+  // This ensures the board always reflects server state:
+  //   - tasks assigned to others are absent from "Mes tâches"
+  //   - fresh `assigne` relations appear after an owner change
+  const silentReload = async () => {
+    try {
+      const data = taskView === 'team' ? await getTeamTasks() : await getMyTasks();
+      setTasks(data);
+      setTabCounts(prev => ({ ...prev, [taskView]: data.length }));
+      // Keep the detail modal in sync if it is open
+      setSelectedTask(prev =>
+        prev ? (data.find(t => t.id === prev.id) ?? prev) : null
+      );
+    } catch {
+      // Intentionally silent — the triggering action already showed a toast
+    }
+  };
+
   const doCompleteTask = async (taskId: number) => {
     try {
       const { data: updated, message } = await completeTask(taskId);
+      // Optimistic patch for instant visual feedback
       setTasks(prev => prev.map(t => t.id === updated.id ? updated : t));
       toast.success(message);
+      void silentReload();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Impossible de compléter la tâche');
     }
   };
 
-  const handleTaskCreated = (task: ApiTask) => {
-    setTasks(prev => [task, ...prev]);
+  // After create: close modal, reload scoped list so team tasks don't bleed
+  // into "Mes tâches" and vice-versa.
+  const handleTaskCreated = () => {
     setIsCreateModalOpen(false);
+    void silentReload();
   };
 
+  // Called from the detail modal's own complete button
   const handleTaskUpdated = (task: ApiTask) => {
     setTasks(prev => prev.map(t => t.id === task.id ? task : t));
     setSelectedTask(task);
+    void silentReload();
+  };
+
+  const handleOpenEdit = (task: ApiTask) => {
+    setEditingTask(task);
+  };
+
+  // After edit: optimistic patch first (instant feedback), then reload to pull
+  // the fresh `assigne` object from the server (owner change).
+  const handleTaskEdited = (task: ApiTask) => {
+    setTasks(prev => prev.map(t => t.id === task.id ? task : t));
+    setSelectedTask(prev => (prev?.id === task.id ? task : prev));
+    setEditingTask(null);
+    void silentReload();
+  };
+
+  const activeFiltersCount =
+    (filterPriority !== 'all' ? 1 : 0) + (filterStatus !== 'all' ? 1 : 0);
+
+  const resetFilters = () => {
+    setFilterPriority('all');
+    setFilterStatus('all');
   };
 
   return (
@@ -207,15 +272,33 @@ const TaskPageContent = () => {
               <div className="flex bg-slate-100 dark:bg-gray-800 rounded-lg p-1">
                 <button
                   onClick={() => setTaskView('mine')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${taskView === 'mine' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${taskView === 'mine' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
                 >
                   Mes tâches
+                  {tabCounts.mine !== null && (
+                    <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold transition-colors ${
+                      taskView === 'mine'
+                        ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                        : 'bg-slate-200 dark:bg-gray-700 text-slate-600 dark:text-gray-400'
+                    }`}>
+                      {tabCounts.mine}
+                    </span>
+                  )}
                 </button>
                 <button
                   onClick={() => setTaskView('team')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${taskView === 'team' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${taskView === 'team' ? 'bg-white dark:bg-gray-700 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
                 >
                   Équipe
+                  {tabCounts.team !== null && (
+                    <span className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold transition-colors ${
+                      taskView === 'team'
+                        ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                        : 'bg-slate-200 dark:bg-gray-700 text-slate-600 dark:text-gray-400'
+                    }`}>
+                      {tabCounts.team}
+                    </span>
+                  )}
                 </button>
               </div>
             )}
@@ -261,18 +344,68 @@ const TaskPageContent = () => {
           <button
             type="button"
             onClick={() => setIsFiltersModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-gray-700 hover:text-slate-700 dark:hover:text-gray-300 transition-colors"
+            className={`relative flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              activeFiltersCount > 0
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50'
+                : 'bg-slate-100 dark:bg-gray-800 text-slate-500 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-gray-700 hover:text-slate-700 dark:hover:text-gray-300'
+            }`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
-            </svg>
+            <SlidersHorizontal size={15} />
             Filtres
+            {activeFiltersCount > 0 && (
+              <span className="ml-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                {activeFiltersCount}
+              </span>
+            )}
           </button>
 
           <div className="text-sm text-slate-500 dark:text-gray-400 lg:ml-auto">
             {filteredTasks.length} tâche{filteredTasks.length !== 1 ? 's' : ''}
           </div>
         </div>
+
+        {/* Active filter chips */}
+        {activeFiltersCount > 0 && (
+          <div className="flex items-center gap-2 flex-wrap mt-2">
+            <span className="text-xs text-slate-500 dark:text-gray-400 font-medium">Filtres actifs :</span>
+
+            {filterPriority !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-700">
+                <span className={`w-2 h-2 rounded-full ${PRIORITIES[filterPriority]?.color ?? 'bg-slate-400'}`} />
+                Priorité : {PRIORITIES[filterPriority]?.label ?? filterPriority}
+                <button
+                  onClick={() => setFilterPriority('all')}
+                  className="ml-0.5 hover:text-violet-900 dark:hover:text-violet-100 transition-colors"
+                  aria-label="Supprimer le filtre priorité"
+                >
+                  <XIcon size={12} />
+                </button>
+              </span>
+            )}
+
+            {filterStatus !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-700">
+                <span className="w-2 h-2 rounded-full bg-sky-500" />
+                Statut : {STATUSES[filterStatus]?.name ?? filterStatus}
+                <button
+                  onClick={() => setFilterStatus('all')}
+                  className="ml-0.5 hover:text-sky-900 dark:hover:text-sky-100 transition-colors"
+                  aria-label="Supprimer le filtre statut"
+                >
+                  <XIcon size={12} />
+                </button>
+              </span>
+            )}
+
+            <button
+              onClick={resetFilters}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-slate-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border border-slate-200 dark:border-gray-700 transition-colors"
+            >
+              <XIcon size={11} />
+              Réinitialiser
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -346,6 +479,7 @@ const TaskPageContent = () => {
                         onOpenContextMenu={(taskId, x, y) => setContextMenuState({ taskId, x, y })}
                         onCloseContextMenu={() => setContextMenuState(null)}
                         onCompleteTask={doCompleteTask}
+                        onEditTask={handleOpenEdit}
                       />
                     ))}
 
@@ -395,6 +529,15 @@ const TaskPageContent = () => {
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onTaskUpdated={handleTaskUpdated}
+          onEdit={() => handleOpenEdit(selectedTask)}
+        />
+      )}
+
+      {editingTask && (
+        <TaskEditModal
+          task={editingTask}
+          onClose={() => setEditingTask(null)}
+          onTaskUpdated={handleTaskEdited}
         />
       )}
     </div>

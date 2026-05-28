@@ -64,6 +64,7 @@ export type CreateTaskPayload = {
 };
 
 export type UpdateTaskPayload = {
+  idUserAssigne: number;
   titre?: string;
   description?: string | null;
   dateDebut?: string;
