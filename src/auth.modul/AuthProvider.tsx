@@ -140,22 +140,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, motDePasse: string) => {
-    setLoading(true);
+    const response = await authApi.post<AuthResponse<LoginData>>(
+      "/auth/login",
+      {
+        email,
+        motDePasse,
+      },
+    );
 
-    try {
-      const response = await authApi.post<AuthResponse<LoginData>>(
-        "/auth/login",
-        {
-          email,
-          motDePasse,
-        },
-      );
-
-      const { token: nextToken, user: nextUser } = response.data.data;
-      persistSession(nextToken, nextUser);
-    } finally {
-      setLoading(false);
-    }
+    const { token: nextToken, user: nextUser } = response.data.data;
+    persistSession(nextToken, nextUser);
   };
 
   const register = async (payload: RegisterPayload) => {

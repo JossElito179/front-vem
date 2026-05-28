@@ -44,9 +44,9 @@ const Signup = () => {
                     {/* Left Side - Informations personnelles */}
                     <Grid size={{ xs: 12, md: 6 }}>
                         <div className={`${cardBg} ${shadowClass} shadow-xl rounded-2xl p-6 sm:p-8 md:p-10 h-full transition-all duration-300`}>
-                            <div className="text-center mb-6 md:mb-8">
+                            <div className="text-left mb-6 md:mb-8">
                                 <img 
-                                    className="rounded-full mx-auto w-16 h-16 sm:w-20 sm:h-20 object-cover shadow-md" 
+                                    className="rounded-full w-16 h-16 sm:w-20 sm:h-20 object-cover shadow-md" 
                                     src={logo} 
                                     alt="Logo" 
                                 />
