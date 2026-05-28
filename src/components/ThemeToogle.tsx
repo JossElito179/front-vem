@@ -59,7 +59,7 @@ const ThemeToggle = () => {
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className="flex items-center justify-center p-2 rounded-lg
-            dark:bg-gradient-to-br bg-white dark:from-gray-800 dark:to-gray-900
+            dark:bg-linear-to-br bg-white dark:from-gray-800 dark:to-gray-900
             hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-700 dark:hover:to-gray-800
             shadow-sm hover:shadow-md
             transition-all duration-300 ease-out

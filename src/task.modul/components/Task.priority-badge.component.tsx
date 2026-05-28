@@ -5,7 +5,7 @@ type PriorityBadgeProps = {
 };
 
 const PriorityBadge = ({ priority }: PriorityBadgeProps) => {
-  const config = PRIORITIES[priority] || PRIORITIES.medium;
+  const config = PRIORITIES[priority] ?? PRIORITIES.NORMALE;
   const Icon = config.icon;
 
   return (
