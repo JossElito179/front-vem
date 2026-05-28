@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../auth.modul/AuthProvider';
 import { X } from 'lucide-react';
 import { TbLayoutDashboard } from "react-icons/tb";
 import { FaCalendarXmark } from "react-icons/fa6";
@@ -15,16 +16,24 @@ interface SidebarProps {
   onCloseMobile?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  isCollapsed = false, 
-  isMobile = false, 
-  onCloseMobile 
+const Sidebar: React.FC<SidebarProps> = ({
+  isCollapsed = false,
+  isMobile = false,
+  onCloseMobile
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+
+  const displayName = user ? `${user.prenom} ${user.nom}` : '—';
+  const displayRole = user?.poste?.libelle ?? user?.rang?.libelle ?? 'Employé';
+  const initials = user
+    ? `${user.nom.charAt(0)}${user.prenom.charAt(0)}`.toUpperCase()
+    : 'U';
+  const hasTeamPerm = user?.permissions.includes('VOIR_EQUIPE_PROPRE') ?? false;
 
   // Menu items configuration
-  const menuItems = [
+  const allMenuItems = [
     {
       id: 'dashboard',
       label: 'Dashboard',
@@ -61,18 +70,23 @@ const Sidebar: React.FC<SidebarProps> = ({
       icon: IoSettingsSharp,
       link: '/parametrages'
     },
-    { 
+    {
       id: 'n-1',
       label: 'N - 1',
       icon: FaArrowsDownToPeople,
-      link: '/subordonnees'
+      link: '/subordonnees',
+      permission: 'VOIR_EQUIPE_PROPRE',
     },
   ];
+
+  const menuItems = allMenuItems.filter(
+    item => !item.permission || (item.permission === 'VOIR_EQUIPE_PROPRE' && hasTeamPerm)
+  );
 
   // Déterminer l'élément actif basé sur la route actuelle
   const activeItem = useMemo(() => {
     const currentPath = location.pathname;
-    const activeMenu = menuItems.find(item => 
+    const activeMenu = menuItems.find(item =>
       currentPath === item.link || currentPath.startsWith(item.link + '/')
     );
     return activeMenu?.id || 'dashboard';
@@ -164,13 +178,13 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Footer / User Info */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <div className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"}`}>
-          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs">
-            U
+          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0">
+            {initials}
           </div>
           {!isCollapsed && (
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">USER 100</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">Employé</p>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{displayName}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{displayRole}</p>
             </div>
           )}
         </div>

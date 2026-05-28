@@ -5,17 +5,21 @@ import { useAuth } from "../auth.modul/AuthProvider";
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
-  onLogoutRequest?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
   onToggleSidebar,
-  onLogoutRequest,
 }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  const displayName = user ? `${user.prenom} ${user.nom}` : '—';
+  const displayRole = user?.poste?.libelle ?? user?.rang?.libelle ?? 'Employé';
+  const initials = user
+    ? `${user.nom.charAt(0)}${user.prenom.charAt(0)}`.toUpperCase()
+    : 'U';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -100,14 +104,14 @@ const Header: React.FC<HeaderProps> = ({
               className="flex items-center space-x-2 md:space-x-3 focus:outline-none hover:opacity-80 transition-opacity"
             >
               <div className="w-8 h-8 md:w-10 md:h-10 bg-linear-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xs md:text-sm">
-                U
+                {initials}
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  USER 100
+                  {displayName}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Administrateur
+                  {displayRole}
                 </p>
               </div>
               <svg
