@@ -9,14 +9,93 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo_complete.jpeg";
 import ThemeToggle from "../components/ThemeToogle";
+import { useToast } from "../components/Toast";
+import { useAuth } from "./AuthProvider";
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { success, error, warning } = useToast();
+  const { register, loading } = useAuth();
+
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [idRang, setIdRang] = useState<number | "">("");
+  const [idPoste, setIdPoste] = useState<number | "">("");
+  const [idManager, setIdManager] = useState<string>("");
+  const [email, setEmail] = useState("");
+  const [motDePasse, setMotDePasse] = useState("");
+  const [confirmMotDePasse, setConfirmMotDePasse] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   const [darkMode, setDarkMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse || !idRang) {
+      warning("Veuillez remplir tous les champs obligatoires.", {
+        position: "top-center",
+      });
+      return;
+    }
+
+    if (motDePasse.length < 8) {
+      warning("Le mot de passe doit contenir au moins 8 caractères.", {
+        position: "top-center",
+      });
+      return;
+    }
+
+    if (motDePasse !== confirmMotDePasse) {
+      warning("Les mots de passe ne correspondent pas.", {
+        position: "top-center",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await register({
+        nom,
+        prenom,
+        email,
+        motDePasse,
+        dateEmbauche: new Date().toISOString().slice(0, 10),
+        idRang: Number(idRang),
+        idPoste: idPoste ? Number(idPoste) : undefined,
+        idManager: idManager ? Number(idManager) : undefined,
+      });
+
+      success("Compte créé avec succès.", {
+        position: "top-right",
+      });
+      navigate("/");
+    } catch (err) {
+      let errorMessage = "Erreur lors de l'inscription.";
+
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const responseData = err.response.data as {
+          error?: string;
+          message?: string;
+        };
+        errorMessage =
+          responseData.error || responseData.message || errorMessage;
+      }
+
+      error(errorMessage, {
+        position: "top-center",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -81,7 +160,7 @@ const Signup = () => {
                 </p>
               </div>
 
-              <FormControl component="form" className="w-full">
+              <FormControl className="w-full">
                 {/* Nom */}
                 <div className="mb-4 sm:mb-5">
                   <p
@@ -94,6 +173,8 @@ const Signup = () => {
                     placeholder="Votre nom"
                     variant="outlined"
                     size="medium"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
                     className="transition-all duration-300"
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -130,6 +211,8 @@ const Signup = () => {
                     placeholder="Votre prénom"
                     variant="outlined"
                     size="medium"
+                    value={prenom}
+                    onChange={(e) => setPrenom(e.target.value)}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "12px",
@@ -153,57 +236,117 @@ const Signup = () => {
                   />
                 </div>
 
-                {/* Fonction */}
-                <div className="mb-4 sm:mb-5">
-                  <p
-                    className={`text-left mb-2 font-medium ${textLabel} text-sm sm:text-base transition-colors duration-300`}
-                  >
-                    Fonction
-                  </p>
-                  <FormControl fullWidth size="medium">
-                    <InputLabel
-                      sx={{
-                        color: darkMode ? "#94a3b8" : "#6b7280",
-                        "&.Mui-focused": {
-                          color: darkMode ? "#60a5fa" : "#1a1a1a",
-                        },
-                      }}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+                  {/* Rang */}
+                  <div className="mb-4 sm:mb-5">
+                    <p
+                      className={`text-left mb-2 font-medium ${textLabel} text-sm sm:text-base transition-colors duration-300`}
                     >
-                      Poste occupé
-                    </InputLabel>
-                    <Select
-                      label="Poste occupé"
-                      defaultValue=""
-                      sx={{
-                        borderRadius: "12px",
-                        backgroundColor: darkMode ? "#334155" : "#fff",
-                        color: darkMode ? "#fff" : "#111827",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: darkMode ? "#475569" : "#e5e7eb",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: darkMode ? "#64748b" : "#9ca3af",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
-                        },
-                      }}
-                      MenuProps={{
-                        slotProps: {
-                          paper: {
-                            sx: {
-                              backgroundColor: darkMode ? "#334155" : "#fff",
-                              color: darkMode ? "#fff" : "#111827",
+                      Rang
+                    </p>
+                    <FormControl fullWidth size="medium">
+                      <InputLabel
+                        sx={{
+                          color: darkMode ? "#94a3b8" : "#6b7280",
+                          "&.Mui-focused": {
+                            color: darkMode ? "#60a5fa" : "#1a1a1a",
+                          },
+                        }}
+                      >
+                        Rang
+                      </InputLabel>
+                      <Select
+                        label="Rang"
+                        value={idRang}
+                        onChange={(e) => setIdRang(e.target.value as number | "")}
+                        sx={{
+                          borderRadius: "12px",
+                          backgroundColor: darkMode ? "#334155" : "#fff",
+                          color: darkMode ? "#fff" : "#111827",
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#475569" : "#e5e7eb",
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#64748b" : "#9ca3af",
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
+                          },
+                        }}
+                        MenuProps={{
+                          slotProps: {
+                            paper: {
+                              sx: {
+                                backgroundColor: darkMode ? "#334155" : "#fff",
+                                color: darkMode ? "#fff" : "#111827",
+                              },
                             },
                           },
-                        },
-                      }}
+                        }}
+                      >
+                        <MenuItem value={1}>Manager général</MenuItem>
+                        <MenuItem value={2}>Manager équipe</MenuItem>
+                        <MenuItem value={3}>Employé</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+
+                  {/* Poste */}
+                  <div className="mb-4 sm:mb-5">
+                    <p
+                      className={`text-left mb-2 font-medium ${textLabel} text-sm sm:text-base transition-colors duration-300`}
                     >
-                      <MenuItem value={1}>Manager général</MenuItem>
-                      <MenuItem value={2}>Manager équipe</MenuItem>
-                      <MenuItem value={3}>Employé</MenuItem>
-                    </Select>
-                  </FormControl>
+                      Poste
+                    </p>
+                    <FormControl fullWidth size="medium">
+                      <InputLabel
+                        sx={{
+                          color: darkMode ? "#94a3b8" : "#6b7280",
+                          "&.Mui-focused": {
+                            color: darkMode ? "#60a5fa" : "#1a1a1a",
+                          },
+                        }}
+                      >
+                        Poste occupé
+                      </InputLabel>
+                      <Select
+                        label="Poste occupé"
+                        value={idPoste}
+                        onChange={(e) => setIdPoste(e.target.value as number | "")}
+                        sx={{
+                          borderRadius: "12px",
+                          backgroundColor: darkMode ? "#334155" : "#fff",
+                          color: darkMode ? "#fff" : "#111827",
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#475569" : "#e5e7eb",
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#64748b" : "#9ca3af",
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
+                          },
+                        }}
+                        MenuProps={{
+                          slotProps: {
+                            paper: {
+                              sx: {
+                                backgroundColor: darkMode ? "#334155" : "#fff",
+                                color: darkMode ? "#fff" : "#111827",
+                              },
+                            },
+                          },
+                        }}
+                      >
+                        <MenuItem value="">Aucun</MenuItem>
+                        <MenuItem value={1}>Développeur</MenuItem>
+                        <MenuItem value={2}>Marketeur</MenuItem>
+                        <MenuItem value={3}>Support technique</MenuItem>
+                        <MenuItem value={4}>Manager</MenuItem>
+                        <MenuItem value={5}>Designer</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
                 </div>
 
                 {/* N+1 Assigner */}
@@ -226,7 +369,8 @@ const Signup = () => {
                     </InputLabel>
                     <Select
                       label="Personne responsable"
-                      defaultValue=""
+                      value={idManager}
+                      onChange={(e) => setIdManager(String(e.target.value))}
                       sx={{
                         borderRadius: "12px",
                         backgroundColor: darkMode ? "#334155" : "#fff",
@@ -252,10 +396,11 @@ const Signup = () => {
                         },
                       }}
                     >
-                      <MenuItem value="kage">Kage</MenuItem>
-                      <MenuItem value="henintsoa">Henintsoa</MenuItem>
-                      <MenuItem value="panda">Panda</MenuItem>
-                      <MenuItem value="najo">Najo</MenuItem>
+                      <MenuItem value="">Aucun</MenuItem>
+                      <MenuItem value="1">Kage</MenuItem>
+                      <MenuItem value="2">Henintsoa</MenuItem>
+                      <MenuItem value="3">Panda</MenuItem>
+                      <MenuItem value="4">Najo</MenuItem>
                     </Select>
                   </FormControl>
                 </div>
@@ -286,7 +431,7 @@ const Signup = () => {
                 </p>
               </div>
 
-              <FormControl component="form" className="w-full">
+              <FormControl component="form" className="w-full" onSubmit={handleSubmit}>
                 {/* Email */}
                 <div className="mb-4 sm:mb-5">
                   <p
@@ -300,6 +445,8 @@ const Signup = () => {
                     placeholder="exemple@email.com"
                     variant="outlined"
                     size="medium"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: "12px",
@@ -336,6 +483,8 @@ const Signup = () => {
                     placeholder="Entrez votre mot de passe"
                     variant="outlined"
                     size="medium"
+                    value={motDePasse}
+                    onChange={(e) => setMotDePasse(e.target.value)}
                     slotProps={{
                       input: {
                         endAdornment: (
@@ -422,6 +571,8 @@ const Signup = () => {
                     placeholder="Confirmez votre mot de passe"
                     variant="outlined"
                     size="medium"
+                    value={confirmMotDePasse}
+                    onChange={(e) => setConfirmMotDePasse(e.target.value)}
                     slotProps={{
                       input: {
                         endAdornment: (
@@ -499,6 +650,8 @@ const Signup = () => {
 
                 {/* Bouton */}
                 <Button
+                  type="submit"
+                  disabled={submitting || loading}
                   fullWidth
                   variant="contained"
                   className={`!h-12 !text-base !font-semibold !normal-case !mb-4 !rounded-xl !transition-all !duration-300 ${btnHover}`}
@@ -509,7 +662,7 @@ const Signup = () => {
                     },
                   }}
                 >
-                  S'inscrire
+                  {submitting || loading ? "Inscription en cours..." : "S'inscrire"}
                 </Button>
 
                 {/* Lien connexion */}

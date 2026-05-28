@@ -50,9 +50,7 @@ const AbscenceListComponent = () => {
 
   const absenceTypes = [
     { id: "CONGES", label: "Congés" },
-    { id: "MALADIE", label: "Maladie" },
-    { id: "FORMATION", label: "Formation" },
-    { id: "AUTRE", label: "Autre" },
+    { id: "OFF", label: "Off" },
   ];
 
   const periods = [
