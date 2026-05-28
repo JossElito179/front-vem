@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useToast } from "../components/Toast.tsx";
 import { useAuth } from "./AuthProvider";
+import ThemeToggle from "../components/ThemeToogle";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,19 @@ const Login = () => {
     }
   }, [isAuthenticated, loading, navigate]);
 
-  const toggleTheme = () => setDarkMode(!darkMode);
+  useEffect(() => {
+    const root = window.document.documentElement;
+    const syncTheme = () => {
+      setDarkMode(root.classList.contains("dark"));
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Classes conditionnelles selon le thème
   const bgClass = darkMode ? "bg-slate-900" : "bg-gray-50";
@@ -31,6 +44,48 @@ const Login = () => {
   const shadowClass = darkMode ? "shadow-slate-900/30" : "shadow-gray-200/50";
   const btnHover = darkMode ? "hover:bg-slate-600" : "hover:bg-gray-800";
   const linkColor = darkMode ? "text-blue-400" : "text-gray-900";
+  const textFieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      backgroundColor: "transparent",
+      color: darkMode ? "#fff" : "#111827",
+      "&.Mui-focused": {
+        backgroundColor: "transparent",
+      },
+      "& input": {
+        backgroundColor: "transparent",
+      },
+      "& input:-webkit-autofill": {
+        WebkitBoxShadow: "0 0 0 1000px transparent inset",
+        WebkitTextFillColor: darkMode ? "#fff" : "#111827",
+        caretColor: darkMode ? "#fff" : "#111827",
+        transition: "background-color 5000s ease-in-out 0s",
+      },
+      "& input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active": {
+        WebkitBoxShadow: "0 0 0 1000px transparent inset",
+        WebkitTextFillColor: darkMode ? "#fff" : "#111827",
+      },
+      "& fieldset": {
+        borderColor: darkMode ? "#475569" : "#e5e7eb",
+      },
+      "&:hover fieldset": {
+        borderColor: darkMode ? "#64748b" : "#9ca3af",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: darkMode ? "#94a3b8" : "#6b7280",
+      "&.Mui-focused": {
+        color: darkMode ? "#60a5fa" : "#1a1a1a",
+      },
+    },
+    "& .MuiInputBase-input::placeholder": {
+      color: darkMode ? "#94a3b8" : "#9ca3af",
+      opacity: 1,
+    },
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,34 +138,9 @@ const Login = () => {
         <div
           className={`${bgClass} min-h-screen flex items-center justify-center transition-colors duration-300`}
         >
-          {/* Toggle Dark/Light */}
-          <button
-            onClick={toggleTheme}
-            className={`fixed top-4 right-4 p-3 rounded-full ${cardBg} ${shadowClass} shadow-lg transition-all duration-300 hover:scale-110 z-50`}
-            title={darkMode ? "Passer en mode clair" : "Passer en mode sombre"}
-          >
-            {darkMode ? (
-              <svg
-                className="w-5 h-5 text-yellow-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-5 h-5 text-gray-700"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-              </svg>
-            )}
-          </button>
+          <div className="fixed top-4 right-4 z-50">
+            <ThemeToggle />
+          </div>
 
           <div className="container mx-auto px-4 py-8 max-w-6xl">
             <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
@@ -155,35 +185,7 @@ const Login = () => {
                           variant="outlined"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          sx={{
-                            "& .MuiOutlinedInput-root": {
-                              borderRadius: "12px",
-                              backgroundColor: "transparent",
-                              color: darkMode ? "#fff" : "#111827",
-                              "&.Mui-focused": {
-                                backgroundColor: "transparent",
-                              },
-                              "& fieldset": {
-                                borderColor: darkMode ? "#475569" : "#e5e7eb",
-                              },
-                              "&:hover fieldset": {
-                                borderColor: darkMode ? "#64748b" : "#9ca3af",
-                              },
-                              "&.Mui-focused fieldset": {
-                                borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
-                              },
-                            },
-                            "& .MuiInputLabel-root": {
-                              color: darkMode ? "#94a3b8" : "#6b7280",
-                              "&.Mui-focused": {
-                                color: darkMode ? "#60a5fa" : "#1a1a1a",
-                              },
-                            },
-                            "& .MuiInputBase-input::placeholder": {
-                              color: darkMode ? "#94a3b8" : "#9ca3af",
-                              opacity: 1,
-                            },
-                          }}
+                          sx={textFieldSx}
                         />
                       </div>
 
@@ -201,35 +203,7 @@ const Login = () => {
                           type="password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          sx={{
-                            "& .MuiOutlinedInput-root": {
-                              borderRadius: "12px",
-                              backgroundColor: "transparent",
-                              color: darkMode ? "#fff" : "#111827",
-                              "&.Mui-focused": {
-                                backgroundColor: "transparent",
-                              },
-                              "& fieldset": {
-                                borderColor: darkMode ? "#475569" : "#e5e7eb",
-                              },
-                              "&:hover fieldset": {
-                                borderColor: darkMode ? "#64748b" : "#9ca3af",
-                              },
-                              "&.Mui-focused fieldset": {
-                                borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
-                              },
-                            },
-                            "& .MuiInputLabel-root": {
-                              color: darkMode ? "#94a3b8" : "#6b7280",
-                              "&.Mui-focused": {
-                                color: darkMode ? "#60a5fa" : "#1a1a1a",
-                              },
-                            },
-                            "& .MuiInputBase-input::placeholder": {
-                              color: darkMode ? "#94a3b8" : "#9ca3af",
-                              opacity: 1,
-                            },
-                          }}
+                          sx={textFieldSx}
                         />
                       </div>
 
