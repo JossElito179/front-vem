@@ -6,6 +6,7 @@ import Dashboard from './dashboard.modul/pages/Dashboard.page'
 import AbscenceDemande from './abscence.modul/pages/AbsenceDemande.page'
 import AbscenceListes from './abscence.modul/pages/AbscenceList.page'
 import TaskPage from './task.modul/pages/task.component'
+import SubordonneesPage from './subordonnees.modul/pages/Subordonnees.page'
 import ProtectedRoute from './auth.modul/ProtectedRoute'
 
 const routes: RouteObject[] = [
@@ -31,8 +32,12 @@ const routes: RouteObject[] = [
 	},
 	{
 		path: '/tasks',
-		element: createElement(ProtectedRoute, null, createElement(TaskPage))
-	}
+		element: createElement(ProtectedRoute, null, createElement(TaskPage)),
+	},
+	{
+		path: '/subordonnees',
+		element: createElement(ProtectedRoute, null, createElement(SubordonneesPage)),
+	},
 ]
 
 export default routes

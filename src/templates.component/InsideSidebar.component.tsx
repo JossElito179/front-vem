@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
 import Sidebar from "./Sidebar.component";
@@ -21,9 +21,6 @@ const InsideSidebar: React.FC<InsideSidebarProps> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(initialIsCollapsed);
   const [isMobile, setIsMobile] = useState<boolean>(initialIsMobile);
   const [showSidebar, setShowSidebar] = useState<boolean>(initialShowSidebar);
-
-  // Refs
-  const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   // Hooks
   const location = useLocation();
@@ -74,9 +71,6 @@ const InsideSidebar: React.FC<InsideSidebarProps> = ({ children }) => {
       localStorage.setItem("is-collapsed", String(next));
     }
   };
-
-  // Modal handlers
-  const openLogoutModal = () => dialogRef.current?.showModal();
 
   // Handle logout confirmation
   useEffect(() => {
@@ -142,7 +136,7 @@ const InsideSidebar: React.FC<InsideSidebarProps> = ({ children }) => {
         `}
       >
         {/* Header */}
-        <Header onToggleSidebar={toggleSidebar} onLogoutRequest={openLogoutModal} />
+        <Header onToggleSidebar={toggleSidebar} />
 
         {/* Breadcrumb + Main Content Container */}
         <div className="flex-1 overflow-auto flex flex-col">
