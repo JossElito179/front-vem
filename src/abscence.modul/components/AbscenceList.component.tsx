@@ -71,10 +71,10 @@ const AbscenceListComponent = () => {
 
   return (
     <>
-      <div>
-        <div className="flex w-full h-auto gap-6">
+      <div className="w-full overflow-hidden">
+        <div className="flex w-full h-auto gap-6 px-2 sm:px-4">
           {/* partie gauche w-20% (filter checkbox) */}
-          <div className="hidden md:flex flex-col w-1/5 gap-6 pr-4 border rounded-lg border-gray-200 dark:border-gray-700 p-3">
+          <div className="hidden md:flex flex-col w-1/5 gap-6 pr-2 border rounded-lg border-gray-200 dark:border-gray-700 p-3 min-w-min">
             {/* Type d'absence filter */}
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 text-left">
@@ -139,7 +139,7 @@ const AbscenceListComponent = () => {
           </div>
 
           {/* partie droite w-80% (table and filter modal) */}
-          <div className="flex flex-col gap-6 w-full md:w-4/5">
+          <div className="flex flex-col gap-6 w-full md:w-4/5 min-w-0 overflow-x-auto">
             <div className="flex md:hidden items-center justify-between">
               <FilterBar
                 filters={filters}
@@ -175,14 +175,15 @@ const AbscenceListComponent = () => {
         </div>
 
         {/* calendar */}
-        <div className="mt-20">
+        <div className="mt-20 w-full overflow-hidden px-2 sm:px-4">
           <div className="mb-6 text-left">
             <button 
             onClick={() => setIsBigCalendarOpen(!isBigCalendarOpen)}
-            className="px-4 py-2 flex items-center gap-2 cursor-pointer bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg">
+            className="px-4 py-2 flex items-center gap-2 cursor-pointer bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg whitespace-nowrap">
               <FaCalendarDays /> {!isBigCalendarOpen ? `Big calendar` : `Petit calendar`}
             </button>
           </div>
+          <div className="w-full overflow-x-auto">
           {isBigCalendarOpen && (
             <BigCalendar
               onDateSelect={(date) => {
@@ -199,6 +200,7 @@ const AbscenceListComponent = () => {
               }}
             />
           )}
+          </div>
         </div>
       </div>
     </>

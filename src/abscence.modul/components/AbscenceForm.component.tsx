@@ -335,7 +335,7 @@ const AbsenceForm = ({ isOpen, onClose, selectedDate, onSuccess }: AbscenceFormM
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-6 py-3 rounded-xl font-medium text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-500 dark:hover:to-purple-500"
+                className="border border-gray-300 dark:border-gray-600 flex-1 px-6 py-3 rounded-xl font-medium text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 bg-linear-to-r from-gray-900 to-gray-100 hover:from-gray-800 hover:to-gray-50 dark:from-white dark:to-gray-900 dark:text-gray-900 dark:hover:from-gray-100 dark:hover:to-gray-800"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
@@ -345,7 +345,7 @@ const AbsenceForm = ({ isOpen, onClose, selectedDate, onSuccess }: AbscenceFormM
                 ) : (
                   <span className="flex items-center justify-center gap-2">
                     <Check size={16} />
-                    Demander
+                    Enregistrer
                   </span>
                 )}
               </button>

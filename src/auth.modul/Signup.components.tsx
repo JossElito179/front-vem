@@ -27,6 +27,8 @@ const Signup = () => {
   const [idRang, setIdRang] = useState<number | "">("");
   const [idPoste, setIdPoste] = useState<number | "">("");
   const [idManager, setIdManager] = useState<string>("");
+  const [dateEmbauche, setDateEmbauche] = useState("");
+  const [salaire, setSalaire] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [confirmMotDePasse, setConfirmMotDePasse] = useState("");
@@ -39,7 +41,7 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse || !idRang) {
+    if (!nom || !prenom || !email || !motDePasse || !confirmMotDePasse || !idRang || !dateEmbauche || !salaire) {
       warning("Veuillez remplir tous les champs obligatoires.", {
         position: "top-center",
       });
@@ -67,7 +69,8 @@ const Signup = () => {
         prenom,
         email,
         motDePasse,
-        dateEmbauche: new Date().toISOString().slice(0, 10),
+        dateEmbauche,
+        salaire: Number(salaire),
         idRang: Number(idRang),
         idPoste: idPoste ? Number(idPoste) : undefined,
         idManager: idManager ? Number(idManager) : undefined,
@@ -404,6 +407,88 @@ const Signup = () => {
                     </Select>
                   </FormControl>
                 </div>
+
+                {/* Date d'embauche */}
+                <div className="mb-4 sm:mb-5">
+                  <p
+                    className={`text-left mb-2 font-medium ${textLabel} text-sm sm:text-base transition-colors duration-300`}
+                  >
+                    Date d'embauche
+                  </p>
+                  <TextField
+                    fullWidth
+                    type="date"
+                    variant="outlined"
+                    size="medium"
+                    value={dateEmbauche}
+                    onChange={(e) => setDateEmbauche(e.target.value)}
+                    slotProps={{
+                      inputLabel: {
+                        shrink: true,
+                      },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        backgroundColor: darkMode ? "#334155" : "#fff",
+                        color: darkMode ? "#fff" : "#111827",
+                        "& fieldset": {
+                          borderColor: darkMode ? "#475569" : "#e5e7eb",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: darkMode ? "#64748b" : "#9ca3af",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
+                        },
+                      },
+                    }}
+                  />
+                </div>
+
+                {/* Salaire */}
+                <div className="mb-4 sm:mb-5">
+                  <p
+                    className={`text-left mb-2 font-medium ${textLabel} text-sm sm:text-base transition-colors duration-300`}
+                  >
+                    Salaire
+                  </p>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    placeholder="Entrez le salaire annuel"
+                    variant="outlined"
+                    size="medium"
+                    value={salaire}
+                    onChange={(e) => setSalaire(e.target.value)}
+                    slotProps={{
+                      htmlInput: {
+                        step: "0.01",
+                        min: "0",
+                      },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        backgroundColor: darkMode ? "#334155" : "#fff",
+                        color: darkMode ? "#fff" : "#111827",
+                        "& fieldset": {
+                          borderColor: darkMode ? "#475569" : "#e5e7eb",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: darkMode ? "#64748b" : "#9ca3af",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: darkMode ? "#60a5fa" : "#1a1a1a",
+                        },
+                      },
+                      "& .MuiInputBase-input::placeholder": {
+                        color: darkMode ? "#94a3b8" : "#9ca3af",
+                        opacity: 1,
+                      },
+                    }}
+                  />
+                </div>
               </FormControl>
             </div>
           </Grid>
@@ -654,7 +739,7 @@ const Signup = () => {
                   disabled={submitting || loading}
                   fullWidth
                   variant="contained"
-                  className={`!h-12 !text-base !font-semibold !normal-case !mb-4 !rounded-xl !transition-all !duration-300 ${btnHover}`}
+                  className={`h-12! text-base! font-semibold! normal-case! mb-4! rounded-xl! transition-all! duration-300! ${btnHover}`}
                   sx={{
                     backgroundColor: darkMode ? "#475569" : "#1a1a1a",
                     "&:hover": {

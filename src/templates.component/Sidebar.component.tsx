@@ -44,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       id: 'absence',
       label: 'Absence',
       icon: FaCalendarXmark,
-      link: '/abscence'
+      link: '/absence'
     },
     { 
       id: 'taches',

@@ -142,7 +142,7 @@ const InsideSidebar: React.FC<InsideSidebarProps> = ({ children }) => {
         <div className="flex-1 overflow-auto flex flex-col">
           {/* Breadcrumb Navigation */}
           {breadcrumbs.length > 1 && (
-            <nav className="flex items-center space-x-2 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 relative min-h-12 flex-shrink-0">
+            <nav className="flex items-center space-x-2 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 relative min-h-12 shrink-0">
               <div className="flex items-center">
                 <Home className="w-4 h-4 text-gray-500 dark:text-gray-400 mr-2" />
                 <button

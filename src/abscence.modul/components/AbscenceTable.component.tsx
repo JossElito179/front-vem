@@ -38,9 +38,9 @@ const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
   );
 
   return (
-    <div className="flex w-full">
-      <div className="w-full overflow-x-auto">
-        <div className="p-1.5 w-full inline-block align-middle min-w-175">
+    <div className="w-full overflow-x-auto">
+      <div className="w-full">
+        <div className="p-1.5 w-full">
           <div className="border rounded-lg divide-y divide-gray-200 border-gray-200 dark:border-gray-700 dark:divide-gray-700">
             <div className="py-3 px-4">
               <div className="relative max-w-xs">
@@ -61,7 +61,7 @@ const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
               </div>
             </div>
 
-            <div className="overflow-hidden">
+            <div className="overflow-auto hdie-scrollbar">
               <table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
