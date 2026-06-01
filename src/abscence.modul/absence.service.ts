@@ -1,4 +1,4 @@
-import absenceApi from "./absence.api";
+import { apiClient } from "../utils/constant";
 
 type ApiResponse<T> = {
 	success: boolean;
@@ -75,24 +75,24 @@ const buildQueryString = (params?: AbsenceQueryParams) => {
 };
 
 export async function getAbsenceConfigs() {
-	const response = await absenceApi.get<ApiResponse<AbsenceConfig[]>>("/absences/config");
+	const response = await apiClient.get<ApiResponse<AbsenceConfig[]>>("/absences/config");
 	return response.data.data;
 }
 
 export async function createAbsenceDemand(payload: AbsenceRequestPayload) {
-	const response = await absenceApi.post<ApiResponse<AbsenceRequest>>("/absences/demande", payload);
+	const response = await apiClient.post<ApiResponse<AbsenceRequest>>("/absences/demande", payload);
 	return response.data.data;
 }
 
 export async function getMyAbsenceRequests(params?: AbsenceQueryParams) {
-	const response = await absenceApi.get<ApiResponse<AbsenceRequest[]>>(
+	const response = await apiClient.get<ApiResponse<AbsenceRequest[]>>(
 		`/absences/mes-demandes${buildQueryString(params)}`,
 	);
 	return response.data.data;
 }
 
 export async function getTeamAbsenceRequests(params?: AbsenceQueryParams) {
-	const response = await absenceApi.get<ApiResponse<AbsenceRequest[]>>(
+	const response = await apiClient.get<ApiResponse<AbsenceRequest[]>>(
 		`/absences/equipe${buildQueryString(params)}`,
 	);
 	return response.data.data;
@@ -102,7 +102,7 @@ export async function updateAbsenceValidation(
 	id: number,
 	payload: AbsenceValidationPayload,
 ) {
-	const response = await absenceApi.patch<ApiResponse<AbsenceRequest>>(
+	const response = await apiClient.patch<ApiResponse<AbsenceRequest>>(
 		`/absences/${id}/validation`,
 		payload,
 	);
