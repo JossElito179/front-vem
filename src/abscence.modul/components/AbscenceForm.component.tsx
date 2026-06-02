@@ -335,7 +335,7 @@ const AbsenceForm = ({ isOpen, onClose, selectedDate, onSuccess }: AbscenceFormM
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="border border-gray-300 dark:border-gray-600 flex-1 px-6 py-3 rounded-xl font-medium text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 bg-linear-to-r from-gray-900 to-gray-100 hover:from-gray-800 hover:to-gray-50 dark:from-white dark:to-gray-900 dark:text-gray-900 dark:hover:from-gray-100 dark:hover:to-gray-800"
+                className="border border-gray-300 dark:border-gray-600 flex-1 px-6 py-3 rounded-xl font-medium dark:text-white text-blue-900 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">

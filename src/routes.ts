@@ -9,6 +9,7 @@ import SubordonneesPage from './subordonnees.modul/pages/Subordonnees.page'
 import ProtectedRoute from './auth.modul/ProtectedRoute'
 import PointerComponent from './pointer.modul/pages/Pointer.component'
 import Profile from './profile.modul/page/Profile'
+import SettingComponent from './settings.modul/pages/Settings.component'
 
 const routes: RouteObject[] = [
 	{
@@ -42,6 +43,10 @@ const routes: RouteObject[] = [
 	{
 		path: '/profile',
 		element: createElement(ProtectedRoute, null, createElement(Profile)),
+	},
+	{
+		path: '/parametrages',
+		element: createElement(ProtectedRoute, null, createElement(SettingComponent)),
 	},
 	// {
 	// 	path: '*',
