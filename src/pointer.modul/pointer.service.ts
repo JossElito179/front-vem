@@ -9,7 +9,6 @@ import type {
   PointageCheckinResponse,
   PointageSortieResponse,
   StatutAujourdhuiResponse,
-  StatsPersonnellesResponse,
   StatsEquipeEntry,
 } from "./pointer.interface";
 import {apiClient} from "../utils/constant";
@@ -83,24 +82,24 @@ export async function getStatutAujourdhui(): Promise<StatutAujourdhuiResponse> {
  * @returns Stats mensuelles avec historique et taux d'assiduité
  * @throws Error - Si la requête échoue
  */
-export async function getStatsPersonnelles(
-  mois?: number,
-  annee?: number
-): Promise<StatsPersonnellesResponse> {
-  try {
-    const params: Record<string, number> = {};
-    if (mois !== undefined) params.mois = mois;
-    if (annee !== undefined) params.annee = annee;
+// export async function getStatsPersonnelles(
+//   mois?: number,
+//   annee?: number
+// ): Promise<StatsPersonnellesResponse> {
+//   try {
+//     const params: Record<string, number> = {};
+//     if (mois !== undefined) params.mois = mois;
+//     if (annee !== undefined) params.annee = annee;
 
-    const response = await apiClient.get<StatsPersonnellesResponse>(
-      `${API_BASE}/mes-stats`,
-      { params }
-    );
-    return response.data;
-  } catch (error) {
-    throw toPresenceError(error);
-  }
-}
+//     const response = await apiClient.get<{ success: boolean; message: string; data: StatsPersonnellesResponse }>(
+//       `${API_BASE}/mes-stats`,
+//       { params }
+//     );
+//     return response.data.data;
+//   } catch (error) {
+//     throw toPresenceError(error);
+//   }
+// }
 
 // ============ Statistiques de l'Équipe (Manager) ============
 /**

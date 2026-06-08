@@ -4,7 +4,7 @@ import DashboardComponent from "../components/Dashboard.component"
 const Dashboard = () => { 
     return (
       <InsideSidebar>
-        <div className="flex">
+        <div className="w-full">
           <DashboardComponent />
         </div>
       </InsideSidebar>

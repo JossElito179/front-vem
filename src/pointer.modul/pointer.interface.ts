@@ -50,6 +50,7 @@ export interface PointageCheckinResponse {
   idUser: number;
   debutCheckin: string; // ISO DateTime
   finCheckin: string | null;
+  dureeTravail?: number; // en minutes
   methode: string;
   ipAddress: string | null;
   ssidReseau: string | null;
@@ -58,7 +59,7 @@ export interface PointageCheckinResponse {
   statut: StatutPointage;
   estValide: boolean;
   niveauConfiance: 0 | 1 | 2 | 3;
-  messageConfiance: string;
+  messageConfiance?: string;
   sourceDevice?: string;
   latitude?: number;
   longitude?: number;
