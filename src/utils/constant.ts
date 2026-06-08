@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
 export const AUTH_TOKEN_KEY = "auth_token";
 export const AUTH_USER_KEY = "auth_user";
 
