@@ -55,7 +55,7 @@ const TaskDetailModal = ({ task, onClose, onTaskUpdated, onEdit }: TaskDetailMod
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {onEdit && (
+            {onEdit && !isCompleted && (
               <button
                 onClick={onEdit}
                 title="Modifier la tâche"

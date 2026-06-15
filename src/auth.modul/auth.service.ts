@@ -16,6 +16,19 @@ export type SubordonneeUser = {
   poste: { id: number; rolePredefini: string; estActif: boolean } | null;
 };
 
+export type Poste = {
+  id: number;
+  rolePredefini: string;
+};
+
+export type Manager = {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  rang: { id: number; niveau: number; libelle: string };
+};
+
 function toAuthError(error: unknown, fallback: string): Error {
   if (axios.isAxiosError(error) && error.response?.data) {
     const d = error.response.data as { error?: string; details?: string[] };
@@ -37,5 +50,25 @@ export async function getSubordonnees(): Promise<SubordonneeUser[]> {
     return res.data.data;
   } catch (error) {
     throw toAuthError(error, 'Impossible de charger la liste des employés');
+  }
+}
+
+/** GET /api/auth/postes — public, returns list of active postes */
+export async function getPostes(): Promise<Poste[]> {
+  try {
+    const res = await apiClient.get<ApiResponse<Poste[]>>('/auth/postes');
+    return res.data.data;
+  } catch (error) {
+    throw toAuthError(error, 'Impossible de charger la liste des postes');
+  }
+}
+
+/** GET /api/auth/all-managers — public, returns users with rang niveau 1 or 2 */
+export async function getManagers(): Promise<Manager[]> {
+  try {
+    const res = await apiClient.get<ApiResponse<Manager[]>>('/auth/all-managers');
+    return res.data.data;
+  } catch (error) {
+    throw toAuthError(error, 'Impossible de charger la liste des managers');
   }
 }

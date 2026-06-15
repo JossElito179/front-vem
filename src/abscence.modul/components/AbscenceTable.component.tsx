@@ -3,20 +3,23 @@ import { Search } from "lucide-react";
 import { LuListFilter } from "react-icons/lu";
 
 export type AbsenceTableRow = {
+  absenceId: number;
   date: string;
   type: string;
   motifs: string;
   status: string;
+  demandeur?: string;
 };
 
 type AbscenceTableProps = {
   rows: AbsenceTableRow[];
   isLoadingRows?: boolean;
+  onValidate?: (id: number, statut: 'VALIDE' | 'REFUSE') => void;
 };
 
 const rowsPerPage = 5;
 
-const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
+const AbscenceTable = ({ rows, isLoadingRows = false, onValidate }: AbscenceTableProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -65,6 +68,14 @@ const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
               <table className="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
+                    {onValidate && (
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+                      >
+                        Demandeur
+                      </th>
+                    )}
                     <th
                       scope="col"
                       className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
@@ -101,7 +112,7 @@ const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
                   {isLoadingRows ? (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={onValidate ? 6 : 5}
                         className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
                       >
                         Chargement des demandes d'absence...
@@ -110,9 +121,14 @@ const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
                   ) : paginatedRows.length > 0 ? (
                     paginatedRows.map((row) => (
                       <tr
-                        key={`${row.date}-${row.type}-${row.motifs}`}
+                        key={row.absenceId}
                         className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                       >
+                        {onValidate && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-left text-gray-800 dark:text-gray-200">
+                            {row.demandeur ?? '—'}
+                          </td>
+                        )}
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-left font-medium text-gray-800 dark:text-gray-200">
                           {row.date}
                         </td>
@@ -125,21 +141,44 @@ const AbscenceTable = ({ rows, isLoadingRows = false }: AbscenceTableProps) => {
                           {row.motifs}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
-                          <span className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                            row.status === 'VALIDE'
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                              : row.status === 'REFUSE'
+                              ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                              : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                          }`}>
                             {row.status}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-end text-sm">
-                          <button className="cursor-pointer px-2.5 py-1 hover:bg-gray-100 dark:hover:bg-gray-900/30 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-medium">
-                            <LuListFilter />
-                          </button>
+                          {onValidate && row.status === 'ATTENTE' ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => onValidate(row.absenceId, 'VALIDE')}
+                                className="cursor-pointer px-2.5 py-1 bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400 rounded-lg text-xs font-medium"
+                              >
+                                Approuver
+                              </button>
+                              <button
+                                onClick={() => onValidate(row.absenceId, 'REFUSE')}
+                                className="cursor-pointer px-2.5 py-1 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded-lg text-xs font-medium"
+                              >
+                                Refuser
+                              </button>
+                            </div>
+                          ) : (
+                            <button className="cursor-pointer px-2.5 py-1 hover:bg-gray-100 dark:hover:bg-gray-900/30 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-medium">
+                              <LuListFilter />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={onValidate ? 6 : 5}
                         className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
                       >
                         Aucune demande d'absence trouvée.

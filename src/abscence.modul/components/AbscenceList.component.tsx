@@ -3,40 +3,53 @@ import { useEffect, useState } from "react";
 import AbsenceForm from "./AbscenceForm.component";
 import AbsenceFilterModal from "./AbsenceFilterModal.component";
 import FilterBar from "./FilterBar.component";
-import { getMyAbsenceRequests, type AbsenceRequest } from "../absence.service";
-import AbscenceTable from "./AbscenceTable.component";
+import {
+  getMyAbsenceRequests,
+  getTeamAbsenceRequests,
+  updateAbsenceValidation,
+  type AbsenceRequest,
+} from "../absence.service";
+import AbscenceTable, { type AbsenceTableRow } from "./AbscenceTable.component";
 import Calendar from "../../components/calendar";
 import BigCalendar from "../../components/BigCalendar";
 import { FaCalendarDays } from "react-icons/fa6";
+import { useAuth } from "../../auth.modul/AuthProvider";
 
 const AbscenceListComponent = () => {
+  const { user } = useAuth();
+  const isManager = user?.permissions?.includes('VALIDER_CONGE') ?? false;
+
   const [isAbsenceFormModalOpen, setIsAbsenceFormModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState({ typeAbsence: "", periode: "" });
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [rows, setRows] = useState<
-    Array<{ date: string; type: string; motifs: string; status: string }>
-  >([]);
+  const [activeTab, setActiveTab] = useState<'mine' | 'team'>('mine');
+  const [rows, setRows] = useState<AbsenceTableRow[]>([]);
   const [isLoadingRows, setIsLoadingRows] = useState(false);
   const [isBigCalendarOpen, setIsBigCalendarOpen] = useState(false);
 
+  const mapRequest = (request: AbsenceRequest): AbsenceTableRow => ({
+    absenceId: request.id,
+    date: request.dateDebutAbsence,
+    type:
+      request.configAbsence?.libelle ??
+      request.configAbsence?.typeAbsence ??
+      String(request.idConfigAbsence),
+    motifs: request.motif ?? "-",
+    status: request.statut,
+    demandeur: request.demandeur
+      ? `${request.demandeur.prenom} ${request.demandeur.nom}`
+      : undefined,
+  });
+
   const loadAbsences = async () => {
     setIsLoadingRows(true);
-
     try {
-      const response = await getMyAbsenceRequests();
-
-      setRows(
-        response.map((request: AbsenceRequest) => ({
-          date: request.dateDebutAbsence,
-          type:
-            request.configAbsence?.libelle ??
-            request.configAbsence?.typeAbsence ??
-            String(request.idConfigAbsence),
-          motifs: request.motif ?? "-",
-          status: request.statut,
-        })),
-      );
+      const response =
+        activeTab === 'team' && isManager
+          ? await getTeamAbsenceRequests()
+          : await getMyAbsenceRequests();
+      setRows(response.map(mapRequest));
     } catch {
       setRows([]);
     } finally {
@@ -46,7 +59,16 @@ const AbscenceListComponent = () => {
 
   useEffect(() => {
     void loadAbsences();
-  }, []);
+  }, [activeTab]);
+
+  const handleValidate = async (id: number, statut: 'VALIDE' | 'REFUSE') => {
+    try {
+      await updateAbsenceValidation(id, { statut });
+      void loadAbsences();
+    } catch {
+      // silent — could add a toast here
+    }
+  };
 
   const absenceTypes = [
     { id: "CONGES", label: "Congés" },
@@ -147,7 +169,36 @@ const AbscenceListComponent = () => {
               />
             </div>
 
-            <AbscenceTable rows={rows} isLoadingRows={isLoadingRows} />
+            {isManager && (
+              <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setActiveTab('mine')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'mine'
+                      ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Mes demandes
+                </button>
+                <button
+                  onClick={() => setActiveTab('team')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === 'team'
+                      ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  Demandes de l'équipe
+                </button>
+              </div>
+            )}
+
+            <AbscenceTable
+              rows={rows}
+              isLoadingRows={isLoadingRows}
+              onValidate={activeTab === 'team' && isManager ? handleValidate : undefined}
+            />
           </div>
 
           {/* Modal Formulaire d'absence */}

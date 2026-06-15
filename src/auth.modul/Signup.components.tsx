@@ -16,6 +16,7 @@ import logo from "../assets/logo_complete.jpeg";
 import ThemeToggle from "../components/ThemeToogle";
 import { useToast } from "../components/Toast";
 import { useAuth } from "./AuthProvider";
+import { getPostes, getManagers, type Poste, type Manager } from "./auth.service";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ const Signup = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [postes, setPostes] = useState<Poste[]>([]);
+  const [managers, setManagers] = useState<Manager[]>([]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -112,6 +115,11 @@ const Signup = () => {
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    void getPostes().then(setPostes).catch(() => {});
+    void getManagers().then(setManagers).catch(() => {});
   }, []);
 
   // Classes conditionnelles selon le thème
@@ -342,11 +350,9 @@ const Signup = () => {
                         }}
                       >
                         <MenuItem value="">Aucun</MenuItem>
-                        <MenuItem value={1}>Développeur</MenuItem>
-                        <MenuItem value={2}>Marketeur</MenuItem>
-                        <MenuItem value={3}>Support technique</MenuItem>
-                        <MenuItem value={4}>Manager</MenuItem>
-                        <MenuItem value={5}>Designer</MenuItem>
+                        {postes.map((p) => (
+                          <MenuItem key={p.id} value={p.id}>{p.rolePredefini}</MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   </div>
@@ -400,10 +406,11 @@ const Signup = () => {
                       }}
                     >
                       <MenuItem value="">Aucun</MenuItem>
-                      <MenuItem value="1">Kage</MenuItem>
-                      <MenuItem value="2">Henintsoa</MenuItem>
-                      <MenuItem value="3">Panda</MenuItem>
-                      <MenuItem value="4">Najo</MenuItem>
+                      {managers.map((m) => (
+                        <MenuItem key={m.id} value={String(m.id)}>
+                          {m.prenom} {m.nom}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </div>
